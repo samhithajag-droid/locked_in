@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LockedIn Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" rel="stylesheet">
+</head>
+<body class="bg-blue-300 min-h-screen flex flex-col items-center justify-center p-8">
+    <h1 class="text-3xl font-bold text-black mb-8">Welcome, {{ username }} 👋</h1>
+    <p class="text-black mb-12">You’re now LockedIn! Ready to track your mood, expenses, and more?</p>
+
+    <!-- Cards Container -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-8 w-full max-w-4xl px-4">
+
+        <!-- Study Tracker Card -->
+        <a href="{{ url_for('study_tracker') }}" 
+            class="bg-pink-300 rounded-2xl shadow-lg p-8 flex flex-col items-center hover:scale-105 transform transition duration-300 hover:shadow-2xl">
+            <div class="text-5xl mb-4">📖</div>
+            <h2 class="text-2xl font-semibold text-pink-800">Study Tracker</h2>
+            <p class="text-pink-700 text-center mt-2">Track your study sessions and monitor progress over time.</p>
+        </a>
+
+
+        <!-- Mood Tracker Card -->
+        <a href="{{ url_for('mood_tracker') }}" 
+           class="bg-gray-300 rounded-2xl shadow-lg p-8 flex flex-col items-center hover:scale-105 transform transition duration-300 hover:shadow-2xl">
+            <div class="text-5xl mb-4">😊</div>
+            <h2 class="text-2xl font-semibold text-gray-800">Mood Tracker</h2>
+            <p class="text-gray-700 text-center mt-2">Track your emotions and see your history over time.</p>
+        </a>
+
+        <!-- Expense Tracker Card -->
+        <a href="{{ url_for('expense_tracker') }}" 
+           class="bg-green-300 rounded-2xl shadow-lg p-8 flex flex-col items-center hover:scale-105 transform transition duration-300 hover:shadow-2xl">
+            <div class="text-5xl mb-4">💰</div>
+            <h2 class="text-2xl font-semibold text-green-800">Expense Tracker</h2>
+            <p class="text-green-700 text-center mt-2">Manage your savings and spending with visual charts.</p>
+        </a>
+
+        <!-- Fitness Tracker Card -->
+        <a href="{{ url_for('fitness_tracker') }}" 
+           class="bg-yellow-300 rounded-2xl shadow-lg p-8 flex flex-col items-center hover:scale-105 transform transition duration-300 hover:shadow-2xl">
+            <div class="text-5xl mb-4">🏃</div>
+            <h2 class="text-2xl font-semibold text-yellow-800">Fitness Tracker</h2>
+            <p class="text-yellow-700 text-center mt-2">Track workouts and stay fit with your personal log.</p>
+        </a>
+    
+        <!-- Meal Tracker Card -->
+        <a href="{{ url_for('meal_tracker') }}" 
+            class="bg-purple-400 text-white rounded-2xl shadow-lg p-8 flex flex-col items-center hover:scale-105 transform transition duration-300 hover:shadow-2xl col-span-2">
+
+            <div class="text-5xl mb-4">🍽</div>
+            <h2 class="text-2xl font-semibold text-purple-800">Meal Tracker</h2>
+            <p class="text-purple-700 text-center mt-2">Log your meals and track calorie intake.</p>
+        </a>
+</div>
+
+    <!-- Logout -->
+    <div class="mt-10">
+        <a href="{{ url_for('logout') }}" 
+           class="bg-red-500 text-white px-6 py-3 rounded-full shadow hover:bg-pink-600 transition">
+           Logout
+        </a>
+    </div>
+</body>
+</html>
+

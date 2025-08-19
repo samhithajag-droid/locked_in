@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Study Tracker</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .card {
+  border: 2px solid #f3f4f6; /* default light border */
+  border-radius: 10px;
+  padding: 16px;
+  transition: all 0.3s ease; /* smooth hover effect */
+}
+
+/* Hover effect */
+.card:hover {
+  border-color: #630032ff; /* bright pink border on hover */
+  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3); /* subtle shadow */
+  transform: translateY(-3px); /* slight lift effect */
+}
+    .row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+    label { font-weight: 600; }
+    input[type="text"], input[type="number"] { padding: 8px; border: 1px solid #ccc; border-radius: 6px; }
+    button { padding: 10px 14px; border: 0; border-radius: 8px; cursor: pointer; }
+    button.primary { background: #2563eb; color: white; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #e5e7eb; padding: 8px; text-align: left; }
+    th { background: #f3f4f6; }
+    .muted { color: #6b7280; }
+    .pill { background: #eef2ff; color: #3730a3; padding: 2px 8px; border-radius: 999px; font-size: 12px; }
+    .timer { font-size: 40px; font-weight: 700; }
+    .progress-wrap { background: #f3f4f6; height: 10px; border-radius: 999px; overflow: hidden; }
+    .progress { height: 10px; background: #10b981; width: 0%; transition: width .3s ease; }
+
+  </style>
+</head>
+<body>
+  <h1 style="text-align: center;">📚 Study Tracker</h1>
+
+  <p class="muted" style="text-align: center;">
+  Log sessions by subject and duration, and use Pomodoro. Track your progress below!
+</p>
+
+
+  <div class="grid">
+    <!-- Log form -->
+    <div class="card">
+      <h2>Log a Study Session</h2>
+      <form method="POST">
+        <div class="row">
+          <label>Subject</label>
+          <input type="text" name="subject" placeholder="e.g., Math" required>
+        </div>
+
+<!-- Goal Inputs in Log Form -->
+<div class="row">
+  <label>Target study time for today (in minutes)! </label>
+  <input type="number" name="goal" id="form_goal_minutes" min="0" placeholder="e.g., 120">
+
+  <label>Number of sessions for today:</label>
+  <input type="number" name="goal_sessions" id="form_goal_sessions" min="0" placeholder="e.g., 4">
+</div>
+
+
+
+<!-- Duration Section -->
+<div class="card" style="margin-top:12px;">
+  <h3>Duration (minutes)</h3>
+  <input type="number" name="duration" min="0" placeholder="e.g., 60">
+</div>
+
+<!-- OR Pomodoro Section -->
+<div class="card" style="margin-top:12px;">
+  <h3>Pomodoro</h3>
+  <div class="row">
+    <input type="checkbox" id="use_pomodoro" name="use_pomodoro" onchange="togglePomodoro(this)">
+    <label for="use_pomodoro">Use Pomodoro</label>
+  </div>
+  <div class="row" style="margin-top:6px;">
+    <label>Length (min)</label>
+    <input type="number" name="pomodoro_length" id="pomodoro_length" min="1" value="25" disabled>
+    <label>Count</label>
+    <input type="number" name="pomodoro_count" id="pomodoro_count" min="1" value="1" disabled>
+    <span class="pill" id="pomo_total">= 25 min</span>
+  </div>
+</div>
+
+
+  
+
+        <div style="margin-top:12px;">
+          <button class="primary" type="submit">Add Session</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Pomodoro Timer -->
+    <div class="card">
+      <h2>⏱️ Pomodoro Timer</h2>
+      <div class="row">
+        <label>Length (min)</label>
+        <input type="number" id="timer_length" value="25" min="1">
+        <label>Goal sessions</label>
+        <input type="number" id="timer_goal" value="4" min="0">
+      </div>
+
+      <div style="margin: 16px 0;">
+        <div class="timer" id="timer_display">25:00</div>
+        <div class="progress-wrap" style="margin-top:8px;">
+          <div class="progress" id="timer_progress"></div>
+        </div>
+        <div class="muted" style="margin-top:6px;">
+          Completed: <span id="completed_count">0</span> / <span id="goal_count">4</span>
+        </div>
+      </div>
+
+      <div class="row">
+        <button id="timer_start_btn" onclick="toggleTimer()" class="primary">Start</button>
+        <button onclick="pauseTimer()">Pause</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Past Sessions -->
+  <div class="card" style="margin-top:24px;">
+    <h2>Past Sessions</h2>
+    <table>
+      <tr>
+        <th>Date</th>
+        <th>Subject</th>
+        <th>Duration</th>
+        <th>Goal (min)</th>
+        <th>Goal (sessions)</th>
+      </tr>
+      {% for s in sessions %}
+      <tr>
+        <td>{{ s.date }}</td>
+        <td>{{ s.subject }}</td>
+        <td>{{ s.duration_minutes }} min</td>
+        <td>{{ s.goal_minutes if s.goal_minutes else '-' }}</td>
+        <td>{{ s.goal_sessions if s.goal_sessions else '-' }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+
+  <!-- Charts -->
+  <div class="grid" style="margin-top:24px;">
+    <div class="card">
+      <h2>Minutes by Subject</h2>
+      <canvas id="bySubject"></canvas>
+    </div>
+    <div class="card">
+      <h2>Weekly Total (last 8 weeks)</h2>
+      <canvas id="byWeek"></canvas>
+    </div>
+  </div>
+
+  <script>
+let timer = null;
+let total = 25 * 60;      // total seconds
+let remaining = total;
+let completed = 0;
+
+// DOM elements
+const display = document.getElementById('timer_display');
+const progress = document.getElementById('timer_progress');
+const lenInput = document.getElementById('timer_length');
+const goalInput = document.getElementById('timer_goal');
+const completedSpan = document.getElementById('completed_count');
+const goalSpan = document.getElementById('goal_count');
+const startBtn = document.getElementById('timer_start_btn');
+const formGoalInput = document.getElementById('form_goal_sessions');
+const goalInput = document.getElementById('timer_goal');   // hidden Pomodoro goal input
+const goalSpan = document.getElementById('goal_count');    // visible display
+
+formGoalInput.addEventListener('input', () => {
+  const val = parseInt(formGoalInput.value) || 0;
+  goalInput.value = val;        // update hidden Pomodoro input
+  goalSpan.textContent = val;   // update visible Pomodoro counter
+});
+
+
+function updateDisplay() {
+  const m = Math.floor(remaining / 60);
+  const s = remaining % 60;
+  display.textContent = `${m}:${s.toString().padStart(2,'0')}`;
+}
+
+function updateProgress() {
+  const pct = 100 * (1 - remaining / total);
+  progress.style.width = `${pct}%`;
+}
+
+function tick() {
+  if (remaining > 0) {
+    remaining -= 1;
+    updateDisplay();
+    updateProgress();
+  } else {
+    clearInterval(timer);
+    timer = null;
+    startBtn.textContent = 'Start';
+    completed += 1;
+    completedSpan.textContent = completed;
+    remaining = total;
+    updateDisplay();
+    updateProgress();
+    alert('Pomodoro complete! 🎉');
+  }
+}
+
+// Start / Stop (reset)
+function toggleTimer() {
+  if (timer) {
+    clearInterval(timer);
+    timer = null;
+    startBtn.textContent = 'Start';
+    remaining = total; // reset
+    updateDisplay();
+    updateProgress();
+  } else {
+    timer = setInterval(tick, 1000);
+    startBtn.textContent = 'Stop';
+  }
+}
+
+// Pause (just stops the timer but keeps remaining)
+function pauseTimer() {
+  if (timer) {
+    clearInterval(timer);
+    timer = null;
+    startBtn.textContent = 'Start'; // Start can resume
+  }
+}
+
+
+
+// Length input
+lenInput.addEventListener('input', () => {
+  const minutes = Math.max(1, parseInt(lenInput.value) || 25);
+  total = minutes * 60;
+  remaining = total;
+  updateDisplay();
+  updateProgress();
+});
+
+// Auto-sync goal
+formGoalInput.addEventListener('input', () => {
+  const val = parseInt(formGoalInput.value) || 0;
+  goalInput.value = val;
+  goalSpan.textContent = val;
+});
+
+// Initialize
+updateDisplay();
+goalSpan.textContent = goalInput.value;
+
+// Get references
+const formGoalSessions = document.getElementById('form_goal_sessions'); // input in log form
+const pomoGoalInput = document.getElementById('timer_goal');           // hidden Pomodoro goal input
+const pomoGoalDisplay = document.getElementById('goal_count');         // visible number in Pomodoro timer
+
+// Auto-sync Pomodoro goal with log form
+formGoalSessions.addEventListener('input', () => {
+  const val = parseInt(formGoalSessions.value) || 0;
+  pomoGoalInput.value = val;        // updates hidden input for timer logic
+  pomoGoalDisplay.textContent = val; // updates visible goal number
+});
+
+
+</script>
+
+
+</body>
+</html>

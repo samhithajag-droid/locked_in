@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mood Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-200 min-h-screen flex items-center justify-center">
+
+  <!-- Parent wrapper to stack vertically -->
+  <div class="flex flex-col items-center">
+
+    <!-- Box -->
+    <div class="bg-gray-300 p-8 rounded-2xl shadow-lg w-full max-w-lg">
+        <h1 class="text-xl font-bold mb-4">Mood Tracker</h1>
+        <form method="POST" action="{{ url_for('mood_tracker') }}">
+            <select name="mood" class="border p-2 w-full rounded-lg mb-3" required>
+                <option value="">Select your mood</option>
+                <option value="😊 Happy">😊 Happy</option>
+                <option value="😢 Sad">😢 Sad</option>
+                <option value="😖 Stressed">😖 Stressed</option>
+                <option value="🤩 Excited">🤩 Excited</option> 
+                <option value="😡Angry">😡Angry</option>
+                <option value="😰 Anxious ">😰 Anxious</option>
+                <option value= "😥 Nervous">😥 Nervous </option>
+                <option value= "🙂Normal" > 🙂 Normal </option>
+            </select>
+            <button class="bg-gray-400 hover:bg-gray-500 text-gray-100 w-full py-2 rounded-lg">Save Mood</button>
+        </form>
+
+        <h2 class="mt-6 text-lg font-semibold">Mood History</h2>
+        <table class="w-full mt-2 border">
+            <tr class="bg-gray-100">
+                <th class="p-2 border">Mood</th>
+                <th class="p-2 border">Date</th>
+                <th class="p-2 border">Time</th>
+            </tr>
+            {% for mood in moods %}
+            <tr>
+                <td class="p-2 border">{{ mood.mood }}</td>
+                <td class="p-2 border">{{ mood.date.strftime('%Y-%m-%d') }}</td>
+                <td class="p-2 border">{{ mood.date.strftime('%I:%M %p') }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <!-- Back button -->
+    <div class="mt-6">
+        <a href="{{ url_for('home') }}" class="bg-gray-500 text-white px-6 py-3 rounded-full hover:bg-green-600 transition">
+            Back to Dashboard
+        </a>
+    </div>
+
+  </div>
+
+</body>
+
+
+</html>

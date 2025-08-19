@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expense Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-green-50 p-8 min-h-screen">
+
+
+    <div class="max-w-4xl mx-auto py-10">
+        <h1 class="text-4xl font-bold text-green-800 text-center mb-8">💰 Expense Tracker</h1>
+
+        <!-- Expense Form -->
+        <form method="POST" action="{{ url_for('expense_tracker') }}" class="bg-white p-6 rounded-xl shadow-lg mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-green-700 font-semibold mb-1">Category</label>
+                    <select name="category" class="w-full p-3 rounded-lg border border-green-300 focus:outline-none">
+                        <option value="Savings">Savings</option>
+                        <option value="School Supplies">School Supplies</option>
+                        <option value="Clothes">Clothes</option>
+                        <option value="Snacks">Snacks</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-green-700 font-semibold mb-1">Amount</label>
+                    <input type="number" step="0.01" name="amount" required class="w-full p-3 rounded-lg border border-green-300 focus:outline-none">
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-green-700 font-semibold mb-1">Note</label>
+                    <input type="text" name="note" class="w-full p-3 rounded-lg border border-green-300 focus:outline-none">
+                </div>
+            </div>
+            <button type="submit" class="mt-4 w-full bg-green-500 text-white py-3 rounded-lg hover:bg-green-600 transition">
+                Add Expense
+            </button>
+        </form>
+
+        <!-- Chart -->
+        <div class="bg-white p-6 rounded-xl shadow-lg mb-8">
+            <h2 class="text-2xl font-semibold text-green-800 mb-4">Expense Breakdown</h2>
+            <canvas id="expenseChart" class="mx-auto" style="max-width: 350px; max-height: 350px;"></canvas>
+        </div>
+
+        <!-- Expense List -->
+        <div class="bg-white p-6 rounded-xl shadow-lg">
+            <h2 class="text-2xl font-semibold text-green-800 mb-4">All Expenses</h2>
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-green-200 text-green-800">
+                        <th class="p-3 text-left">Category</th>
+                        <th class="p-3 text-left">Amount</th>
+                        <th class="p-3 text-left">Note</th>
+                        <th class="p-3 text-left">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for e in expenses %}
+                    <tr class="border-b">
+                        <td class="p-3">{{ e.category }}</td>
+                        <td class="p-3">₹{{ e.amount }}</td>
+                        <td class="p-3">{{ e.note }}</td>
+                        <td class="p-3">{{ e.date }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Back to Dashboard -->
+        <div class="mt-6 text-center">
+            <a href="{{ url_for('home') }}" class="bg-green-500 text-white px-6 py-3 rounded-full hover:bg-green-600 transition">
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <script>
+    const ctx = document.getElementById('expenseChart').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: {{ labels | tojson }},
+            datasets: [{
+                data: {{ data | tojson }},
+                backgroundColor: ['#EC4899', '#FBBF24', '#10B981', '#3B82F6']
+            }]
+        }
+    });
+    </script>
+
+
+</body>
+</html>
