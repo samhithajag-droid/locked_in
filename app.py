@@ -18,7 +18,7 @@ db = mysql.connector.connect(
     database=os.getenv("MYSQLDATABASE"),
     port=os.getenv("MYSQLPORT")
 )
-
+    
 cursor = db.cursor(dictionary=True)
 
 # HOME / DASHBOARD
