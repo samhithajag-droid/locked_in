@@ -12,12 +12,14 @@ import os
 import mysql.connector
 
 db = mysql.connector.connect(
-    host=os.getenv("MYSQLHOST"),
-    user=os.getenv("MYSQLUSER"),
-    password=os.getenv("MYSQLPASSWORD"),
-    database=os.getenv("MYSQLDATABASE"),
-    port=os.getenv("MYSQLPORT")
+    host="shinkansen.proxy.rlwy.net",
+    user="root",
+    password="YOUR_RAILWAY_PASSWORD",  # copy from Railway (click "show")
+    database="railway",
+    port=48492
 )
+
+
     
 cursor = db.cursor(dictionary=True)
 
